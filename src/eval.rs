@@ -1,3 +1,5 @@
+use std::convert::From;
+
 /// An operation to perform on two subexpressions.
 #[derive(Debug)]
 enum Operation {
@@ -30,6 +32,24 @@ enum Res {
     Err(String),
 }
 
+impl From<Option<i64>> for Res {
+    fn from(result: Option<i64>) -> Self {
+        match result {
+            Some(value) => Res::Ok(value),
+            None => Res::Err(String::from("error")),
+        }
+    }
+}
+
+impl From<Result<i64, ()>> for Res {
+    fn from(result: Result<i64, ()>) -> Self {
+        match result {
+            Result::Ok(value) => Res::Ok(value),
+            Result::Err(_) => Res::Err(String::from("error")),
+        }
+    }
+}
+
 // Allow `Ok` and `Err` as shorthands for `Res::Ok` and `Res::Err`.
 use Res::{Err, Ok};
 
@@ -51,14 +71,14 @@ fn eval(e: Expression) -> Res {
 
 fn apply_op(op: Operation, left: i64, right: i64) -> Res {
     match op {
-        Operation::Add => Ok(left + right),
-        Operation::Sub => Ok(left - right),
-        Operation::Mul => Ok(left * right),
+        Operation::Add => left.checked_add(right).into(),
+        Operation::Sub => left.checked_sub(right).into(),
+        Operation::Mul => left.checked_mul(right).into(),
         Operation::Div => {
             if right == 0 {
                 Err(String::from("division by zero"))
             } else {
-                Ok(left / right)
+                left.checked_sub(right).into()
             }
         }
     }
@@ -104,6 +124,34 @@ fn test_recursion() {
             right: Box::new(term2),
         }),
         Ok(85)
+    );
+}
+
+#[test]
+fn test_overflow() {
+    assert_eq!(
+        eval(Expression::Op {
+            op: Operation::Add,
+            left: Box::new(Expression::Value(i64::MAX)),
+            right: Box::new(Expression::Value(32)),
+        }),
+        Err(String::from("error"))
+    );
+    assert_eq!(
+        eval(Expression::Op {
+            op: Operation::Sub,
+            left: Box::new(Expression::Value(i64::MIN)),
+            right: Box::new(Expression::Value(i64::MAX)),
+        }),
+        Err(String::from("error"))
+    );
+    assert_eq!(
+        eval(Expression::Op {
+            op: Operation::Mul,
+            left: Box::new(Expression::Value(i64::MAX)),
+            right: Box::new(Expression::Value(i64::MAX)),
+        }),
+        Err(String::from("error"))
     );
 }
 
