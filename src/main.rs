@@ -1,3 +1,4 @@
+mod eval;
 mod luhn;
 
 #[allow(dead_code)]
