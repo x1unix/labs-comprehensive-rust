@@ -32,10 +32,16 @@ enum Res {
     Err(String),
 }
 
+impl From<i64> for Res {
+    fn from(value: i64) -> Self {
+        Ok(value)
+    }
+}
+
 impl From<Option<i64>> for Res {
     fn from(result: Option<i64>) -> Self {
         match result {
-            Some(value) => Res::Ok(value),
+            Some(value) => value.into(),
             None => Res::Err(String::from("error")),
         }
     }
@@ -44,7 +50,7 @@ impl From<Option<i64>> for Res {
 impl From<Result<i64, ()>> for Res {
     fn from(result: Result<i64, ()>) -> Self {
         match result {
-            Result::Ok(value) => Res::Ok(value),
+            Result::Ok(value) => value.into(),
             Result::Err(_) => Res::Err(String::from("error")),
         }
     }
