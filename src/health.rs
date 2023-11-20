@@ -2,14 +2,6 @@
 // TODO: remove this when you're done with your implementation.
 #![allow(unused_variables, dead_code)]
 
-pub struct User {
-    name: String,
-    age: u32,
-    height: f32,
-    visit_count: usize,
-    last_blood_pressure: Option<(u32, u32)>,
-}
-
 pub struct Measurements {
     height: f32,
     blood_pressure: (u32, u32),
@@ -22,41 +14,97 @@ pub struct HealthReport<'a> {
     blood_pressure_change: Option<(i32, i32)>,
 }
 
+pub struct User {
+    name: String,
+    age: u32,
+    height: f32,
+    visit_count: usize,
+    last_blood_pressure: Option<(u32, u32)>,
+}
+
 impl User {
     pub fn new(name: String, age: u32, height: f32) -> Self {
-        todo!("Create a new User instance")
+        // Create a new User instance
+        Self {
+            name,
+            age,
+            height,
+            visit_count: 0,
+            last_blood_pressure: None,
+        }
     }
 
     pub fn name(&self) -> &str {
-        todo!("Return the user's name")
+        // Return the user's name
+        &self.name
     }
 
     pub fn age(&self) -> u32 {
-        todo!("Return the user's age")
+        // Return the user's age
+        self.age
     }
 
     pub fn height(&self) -> f32 {
-        todo!("Return the user's height")
+        // Return the user's height
+        self.height
     }
 
     pub fn doctor_visits(&self) -> u32 {
-        todo!("Return the number of time the user has visited the doctor")
+        // Return the number of time the user has visited the doctor
+        self.visit_count as u32
     }
 
     pub fn set_age(&mut self, new_age: u32) {
-        todo!("Set the user's age")
+        // Set the user's age
+        self.age = new_age
     }
 
     pub fn set_height(&mut self, new_height: f32) {
-        todo!("Set the user's height")
+        // Set the user's height
+        self.height = new_height
     }
 
     pub fn visit_doctor(&mut self, measurements: Measurements) -> HealthReport {
-        todo!("Update a user's statistics based on measurements from a visit to the doctor")
+        // Update a user's statistics based on measurements from a visit to the doctor
+        let Measurements {
+            height,
+            blood_pressure,
+        } = measurements;
+
+        self.visit_count += 1;
+        let result = HealthReport {
+            patient_name: &self.name,
+            visit_count: self.visit_count as u32,
+            height_change: height - self.height,
+            blood_pressure_change: match self.last_blood_pressure {
+                Some(prev) => diff_pressure(prev, blood_pressure),
+                None => None,
+            },
+        };
+
+        self.height = measurements.height;
+        self.last_blood_pressure = Some(measurements.blood_pressure);
+        result
     }
 }
 
-fn main() {
+fn vec2_utoi(v: (u32, u32)) -> (i32, i32) {
+    (v.0 as i32, v.1 as i32)
+}
+
+fn diff_pressure(prev: (u32, u32), cur: (u32, u32)) -> Option<(i32, i32)> {
+    if prev == cur {
+        return None;
+    }
+
+    let (prev_x, prev_y) = vec2_utoi(prev);
+    let (cur_x, cur_y) = vec2_utoi(cur);
+
+    Some((cur_x - prev_x, cur_y - prev_y))
+}
+
+#[test]
+fn test_main() {
     let bob = User::new(String::from("Bob"), 32, 155.2);
     println!("I'm {} and my age is {}", bob.name(), bob.age());
 }
