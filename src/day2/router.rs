@@ -1,6 +1,7 @@
 // TODO: remove this when you're done with your implementation.
 #![allow(unused_variables, dead_code)]
 
+// See: https://google.github.io/comprehensive-rust/exercises/day-2/solutions-afternoon.html
 pub fn prefix_matches(prefix: &str, request_path: &str) -> bool {
     let mut segments = request_path.split("/");
 
