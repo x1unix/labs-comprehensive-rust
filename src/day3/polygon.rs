@@ -16,7 +16,7 @@ impl Point {
 
     pub fn magnitude(&self) -> f64 {
         let Self { x, y } = self;
-        (x.pow(2) as f64 + y.pow(2) as f64).sqrt()
+        f64::from(x.pow(2) + y.pow(2)).sqrt()
     }
 
     pub fn dist(&self, b: Self) -> f64 {
@@ -57,7 +57,8 @@ impl Polygon {
     pub fn left_most_point(&self) -> Option<Point> {
         self.points
             .iter()
-            .reduce(|acc, val| if val.y < acc.y { val } else { acc })
+            .min_by_key(|p| p.x)
+            //.reduce(|acc, val| if val.x < acc.x { val } else { acc })
             .copied()
     }
 
